@@ -1,15 +1,16 @@
 {
-    "name": "@boatbomber/sheetvalues",
-    "version": "3.0.2",
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/boatbomber/SheetValues.git"
-    },
-    "contributors": [
-        "boatbomber"
-    ],
-    "bugs": {
-        "url": "https://github.com/boatbomber/SheetValues/issues"
-    }
+  "name": "@boatbomber/sheetvalues",
+  "version": "3.0.3",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/boatbomber/SheetValues.git"
+  },
+  "contributors": [
+    "boatbomber",
+    "daireb"
+  ],
+  "bugs": {
+    "url": "https://github.com/boatbomber/SheetValues/issues"
+  }
 }

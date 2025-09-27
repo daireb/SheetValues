@@ -258,6 +258,16 @@ local function DictEquals(a, b)
 	return true
 end
 
+local DummyDatastore = {
+	GetAsync = function()
+		return nil
+	end,
+	SetAsync = function() end,
+	UpdateAsync = function(_, callback)
+		return callback(nil)
+	end,
+}
+
 local SheetValues = {}
 
 function SheetValues.new(SpreadId: string, SheetId: string?)
@@ -270,6 +280,15 @@ function SheetValues.new(SpreadId: string, SheetId: string?)
 
 	local ChangedEvent = Instance.new("BindableEvent")
 
+	local dsSuccess, dsReturn = pcall(DatastoreService.GetDataStore, DatastoreService, GUID, "SheetValues")
+	local DataStore
+	if dsSuccess then
+		DataStore = dsReturn
+	else
+		DataStore = DummyDatastore
+		warn("SheetValues: Failed to get DataStore:", dsReturn)
+	end
+
 	local SheetManager = {
 		Changed = ChangedEvent.Event,
 
@@ -278,7 +297,7 @@ function SheetValues.new(SpreadId: string, SheetId: string?)
 		Values = {},
 
 		_ValueChangeEvents = {},
-		_DataStore = DatastoreService:GetDataStore(GUID, "SheetValues"),
+		_DataStore = DataStore,
 		_MessageListener = nil,
 		_Alive = true,
 	}
@@ -385,12 +404,8 @@ function SheetValues.new(SpreadId: string, SheetId: string?)
 
 		-- Send these values to all other servers
 		if self.LastSource == "Google API" then
-			local msgSuccess, msgResponse = pcall(
-				MessagingService.PublishAsync,
-				MessagingService,
-				GUID,
-				#json < 1000 and json or "TriggerStore"
-			)
+			local msgSuccess, msgResponse =
+				pcall(MessagingService.PublishAsync, MessagingService, GUID, #json < 1000 and json or "TriggerStore")
 			--if not msgSuccess then warn(msgResponse) end
 		end
 
@@ -469,7 +484,7 @@ function SheetValues.new(SpreadId: string, SheetId: string?)
 		table.clear(self)
 	end
 
-	pcall(function()
+	task.spawn(pcall, function()
 		SheetManager._MessageListener = MessagingService:SubscribeAsync(GUID, function(Msg)
 			local msgTimestamp = math.floor(Msg.Sent)
 			if msgTimestamp <= SheetManager.LastUpdated then
