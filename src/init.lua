@@ -404,8 +404,12 @@ function SheetValues.new(SpreadId: string, SheetId: string?)
 
 		-- Send these values to all other servers
 		if self.LastSource == "Google API" then
-			local msgSuccess, msgResponse =
-				pcall(MessagingService.PublishAsync, MessagingService, GUID, #json < 1000 and json or "TriggerStore")
+			local msgSuccess, msgResponse = pcall(
+				MessagingService.PublishAsync,
+				MessagingService,
+				GUID,
+				#json < 1000 and json or "TriggerStore"
+			)
 			--if not msgSuccess then warn(msgResponse) end
 		end
 
