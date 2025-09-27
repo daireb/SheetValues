@@ -258,7 +258,7 @@ local function DictEquals(a, b)
 	return true
 end
 
-local DummyDatastore = {
+local DummyDatastore = { -- Dummy Datastore object to fall back to if DataStoreService fails
 	GetAsync = function()
 		return nil
 	end,
